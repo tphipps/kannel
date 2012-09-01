@@ -1,7 +1,7 @@
 /* ==================================================================== 
  * The Kannel Software License, Version 1.0 
  * 
- * Copyright (c) 2001-2010 Kannel Group  
+ * Copyright (c) 2001-2012 Kannel Group  
  * Copyright (c) 1998-2001 WapIT Ltd.   
  * All rights reserved. 
  * 
@@ -249,7 +249,17 @@ static int at2_open_device(PrivAT2data *privdata)
     tios.c_iflag |= IGNPAR; /* ignore parity */
     tios.c_iflag &= ~INPCK;
 #if defined(CRTSCTS)
-    tios.c_cflag |= CRTSCTS; /* enable hardware flow control */
+    if(privdata->modem) {
+        if(privdata->modem->hardware_flow_control) {
+            tios.c_cflag |= CRTSCTS; /* enable hardware flow control */
+        }
+        else {
+            tios.c_cflag &= ~CRTSCTS; /* disable hardware flow control */
+        }
+    }
+    else {
+        tios.c_cflag &= ~CRTSCTS; /* disable hardware flow control */
+    }
 #endif
     tios.c_cc[VSUSP] = 0; /* otherwhise we can not send CTRL Z */
 
@@ -2847,6 +2857,8 @@ static ModemDef *at2_read_modems(PrivAT2data *privdata, Octstr *file, Octstr *id
             modem->message_start = 1;
 
         cfg_get_bool(&modem->enable_mms, grp, octstr_imm("enable-mms"));
+        modem->hardware_flow_control = 1;
+        cfg_get_bool(&modem->hardware_flow_control, grp, octstr_imm("hardware-flow-control"));
 
         /*	
         if (modem->message_storage == NULL)

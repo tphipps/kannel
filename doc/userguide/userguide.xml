@@ -1495,17 +1495,31 @@ admin-password = f00bar
     <row><entry><literal>dlr-storage</literal></entry>
      <entry>type</entry>
      <entry valign="bottom">
-        Defines the way DLRs are stored. If you have build-in external 
-          DLR storage support, i.e. using MySQL you may define here the
-          alternative storage type like <literal>mysql</literal>. 
-          Supported types are:
-          <literal>internal</literal>, 
-          <literal>mysql</literal>,
-          <literal>pgsql</literal>,
-          <literal>sdb</literal>,
-          <literal>mssql</literal>,
-          <literal>sqlite3</literal> and <literal>oracle</literal>.
-          By default this is set to <literal>internal</literal>.
+        Defines the way DLRs are stored. Natively in-memory storage is 
+        supported, which is very fast, but has no persistancy. This means 
+        you will loose all your temporary DLR information on bearebox 
+        re-start. In addition a spool directory approach is natively 
+        supported, which garantees persistancy with a reasonable 
+        performance, depending on your disk IO performance.
+        If you have build-in external DLR storage support, i.e. using 
+        MySQL you may define here the alternative storage type like 
+        <literal>mysql</literal>. 
+        Supported types are:
+        <literal>internal</literal>, 
+        <literal>spool</literal>, 
+        <literal>mysql</literal>,
+        <literal>pgsql</literal>,
+        <literal>sdb</literal>,
+        <literal>mssql</literal>,
+        <literal>sqlite3</literal> and <literal>oracle</literal>.
+        By default this is set to <literal>internal</literal>.
+     </entry></row>
+
+    <row><entry><literal>dlr-spool</literal></entry>
+     <entry>filename</entry>
+     <entry valign="bottom">
+        Depends on <literal>dlr-storage = spool</literal> option used, it 
+        is the spool directory to use for DLR storage data.
      </entry></row>
 
      <row><entry><literal>maximum-queue-length</literal></entry>
@@ -2884,12 +2898,6 @@ secret-nas = radius
         </entry>   
      </row>
 
-     <row><entry><literal>meta-data</literal></entry>
-        <entry>string</entry>
-        <entry valign="bottom">url-encoded string with properly formatted meta-data pair(s)..
-        See <xref linkend="meta-data"> for an explanation about meta-data configuration and encoding.
-        </entry>   
-     </row>
   </tbody>
   </tgroup>
  </table>
@@ -3447,7 +3455,7 @@ address-range = ""
       <entry><literal>number</literal></entry>
       <entry valign="bottom">
       Optional, source address TON setting for the link.
-		(Defaults to 0).
+		(Defaults to 2).
      </entry></row>
 
     <row><entry><literal>source-addr-npi</literal></entry>
@@ -3470,7 +3478,7 @@ address-range = ""
       <entry><literal>number</literal></entry>
       <entry valign="bottom">
       Optional, destination address TON setting for the link.
-		(Defaults to 0).
+		(Defaults to 2).
      </entry></row>
 
     <row><entry><literal>dest-addr-npi</literal></entry>
@@ -4065,6 +4073,13 @@ pin = 2345
 	Defaults to "AT+IFC=2,2"
      </entry></row>
 
+   <row><entry><literal>hardware-flow-control</literal></entry>
+     <entry><literal>boolean</literal></entry>
+     <entry valign="bottom">
+     	Optionally disable hardware handshake on the computer side by setting it to false.
+	Defaults to true.
+     </entry></row>
+
    <row><entry><literal>need-sleep</literal></entry>
      <entry><literal>boolean</literal></entry>
      <entry valign="bottom">
@@ -4498,6 +4513,13 @@ send-url = "http://localhost:20022"
      <entry><literal>string</literal></entry>
      <entry valign="bottom">
        Overrides the default parameter for the 'dlr-mask' field
+       used on incoming requests.
+     </entry></row>
+
+   <row><entry><literal>generic-param-dlr-err (o)</literal></entry>
+     <entry><literal>string</literal></entry>
+     <entry valign="bottom">
+       Overrides the default parameter for the 'dlr-err' field
        used on incoming requests.
      </entry></row>
 
@@ -6833,6 +6855,12 @@ the AT driver is used to receive a SMS on a gsm modem.
 The value of %f will contain the number of the SMSC sending
 the SMS to the SIM card. Other SMSC types than AT do not
 set this field so it will be empty.
+</entry></row>
+
+<row><entry><literal>%x</literal></entry><entry>
+the smsbox-id of the message, identifying from which smsbox connection
+the message is originating. (Only available withing the
+<literal>access-log-format</literal> directive)
 </entry></row>
 
 </tbody>

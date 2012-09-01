@@ -1,7 +1,7 @@
 /* ==================================================================== 
  * The Kannel Software License, Version 1.0 
  * 
- * Copyright (c) 2001-2010 Kannel Group  
+ * Copyright (c) 2001-2012 Kannel Group  
  * Copyright (c) 1998-2001 WapIT Ltd.   
  * All rights reserved. 
  * 
@@ -791,10 +791,12 @@ int main(int argc, char **argv)
     cfg_destroy(cfg);
     octstr_destroy(cfg_filename);
     dlr_shutdown();
-    gwlib_shutdown();
 
-    if (restart == 1)
-        execvp(argv[0],argv);
+    /* now really restart */
+    if (restart)
+        restart_box(argv);
+
+    gwlib_shutdown();
 
     return 0;
 }

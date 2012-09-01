@@ -1,7 +1,7 @@
 /* ==================================================================== 
  * The Kannel Software License, Version 1.0 
  * 
- * Copyright (c) 2001-2010 Kannel Group  
+ * Copyright (c) 2001-2012 Kannel Group  
  * Copyright (c) 1998-2001 WapIT Ltd.   
  * All rights reserved. 
  * 
@@ -1232,7 +1232,7 @@ error:
  * Return the request as an Octstr.
  */
 static Octstr *build_request(char *method_name, Octstr *path_or_url, 
-                             Octstr *host, long port, List *headers, 
+                             Octstr *host, long port, int ssl, List *headers,
                              Octstr *request_body)
 {
     /* XXX headers missing */
@@ -1243,7 +1243,13 @@ static Octstr *build_request(char *method_name, Octstr *path_or_url,
                             method_name, path_or_url);
 
     octstr_format_append(request, "Host: %S", host);
-    if (port != HTTP_PORT)
+    /*
+     * In accordance with HTT/1.1 [RFC 2616], section 14.23 "Host"
+     * we shall ONLY add the port number if it is not one of the
+     * officially assigned port numbers. This means we need to obey
+     * port 80 for non-SSL connections and port 443 for SSL-enabled.
+     */
+    if ((port != HTTP_PORT && !ssl) || (port != HTTPS_PORT && ssl))
         octstr_format_append(request, ":%ld", port);
     octstr_append(request, octstr_imm("\r\n"));
 #ifdef USE_KEEPALIVE 
@@ -1615,13 +1621,13 @@ static int send_request(HTTPServer *trans)
 
     if (proxy_used_for_host(trans->host, trans->url)) {
         proxy_add_authentication(trans->request_headers);
-        request = build_request(http_method2name(trans->method),
-                                trans->url, trans->host, trans->port, 
+        request = build_request(http_method2name(trans->method), trans->url,
+                                trans->host, trans->port, trans->ssl,
                                 trans->request_headers, 
                                 trans->request_body);
     } else {
         request = build_request(http_method2name(trans->method), trans->uri, 
-                                trans->host, trans->port,
+                                trans->host, trans->port, trans->ssl,
                                 trans->request_headers,
                                 trans->request_body);
     }
@@ -3417,14 +3423,17 @@ void http_cgivar_dump(List *cgiargs)
 void http_cgivar_dump_into(List *cgiargs, Octstr *os)
 {
     HTTPCGIVar *v;
+    long i;
 
     if (os == NULL)
         return;
 
     gwlib_assert_init();
 
-    while ((v = gwlist_extract_first(cgiargs)) != NULL)
-        octstr_format_append(os, "&%S=%S", v->name, v->value);
+    for (i = 0; i < gwlist_len(cgiargs); i++) {
+        v = gwlist_get(cgiargs, i);
+        octstr_format_append(os, "&%E=%E", v->name, v->value);
+    }
 }
 
 

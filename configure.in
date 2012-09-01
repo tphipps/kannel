@@ -1,7 +1,7 @@
 dnl /* ==================================================================== 
 dnl  * The Kannel Software License, Version 1.0 
 dnl  * 
-dnl  * Copyright (c) 2001-2010 Kannel Group  
+dnl  * Copyright (c) 2001-2012 Kannel Group  
 dnl  * Copyright (c) 1998-2001 WapIT Ltd.   
 dnl  * All rights reserved. 
 dnl  * 
@@ -138,7 +138,7 @@ case "$host" in
     # location libs and includes.
     found=0
     SDK=""
-    for loc in "MacOSX10.6.sdk" "MacOSX10.5.sdk" "MacOSX10.4u.sdk" "MacOSX10.4.0.sdk" "MacOSX10.3.9.sdk" \
+    for loc in "MacOSX10.7.sdk" "MacOSX10.6.sdk" "MacOSX10.5.sdk" "MacOSX10.4u.sdk" "MacOSX10.4.0.sdk" "MacOSX10.3.9.sdk" \
 	           "MacOSX10.3.0.sdk" "MacOSX10.2.8.sdk" "MacOSX10.1.5.sdk"
   	do 
       if test "$found" = "0" ; then
@@ -239,6 +239,9 @@ AC_CHECK_HEADERS([net/if.h], [], [],
    # include <sys/socket.h>
    #endif
   ])
+AC_CHECK_HEADERS([sys/ucontext.h], [AC_DEFINE(HAVE_UCONTEXT)],
+  [AC_MSG_WARN(System lacks ucontext.h - user context support)]
+)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 
@@ -297,6 +300,14 @@ GW_HAVE_FUNC_FROM(stdio.h, getopt, HAVE_GETOPT_IN_STDIO_H,
 GW_HAVE_FUNC_FROM(unistd.h, getopt, HAVE_GETOPT_IN_UNISTD_H,
     	    	  [Does <unistd.h> declare getopt()?])
 
+dnl POSIX nftw()
+
+AC_CHECK_HEADERS(ftw.h, [
+  AC_CHECK_FUNC(nftw, [ 
+    AC_DEFINE(HAVE_NFTW)
+  ])
+])
+
 
 dnl POSIX regular expression check
 
@@ -308,7 +319,7 @@ AC_CHECK_HEADERS(regex.h, [
 ])
 
 
-dnl Misfeature checks
+dnl Misc feature checks
 
 AC_CONFIG_SECTION([Checking for POSIX threads support])
 

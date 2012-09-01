@@ -1,7 +1,7 @@
 /* ==================================================================== 
  * The Kannel Software License, Version 1.0 
  * 
- * Copyright (c) 2001-2010 Kannel Group  
+ * Copyright (c) 2001-2012 Kannel Group  
  * Copyright (c) 1998-2001 WapIT Ltd.   
  * All rights reserved. 
  * 
@@ -357,11 +357,17 @@ void bb_smscconn_send_failed(SMSCConn *conn, Msg *sms, int reason, Octstr *reply
 	/* write NACK to store file */
         store_save_ack(sms, ack_failed);
 
-	if (conn) counter_increase(conn->failed);
-	if (reason == SMSCCONN_FAILED_DISCARDED)
-	    bb_alog_sms(conn, sms, "DISCARDED SMS");
-	else
-	    bb_alog_sms(conn, sms, "FAILED Send SMS");
+        if (conn) counter_increase(conn->failed);
+        if (reason == SMSCCONN_FAILED_DISCARDED)
+            if (sms->sms.sms_type != report_mt)
+                bb_alog_sms(conn, sms, "DISCARDED SMS");
+            else
+                bb_alog_sms(conn, sms, "DISCARDED DLR");
+        else
+            if (sms->sms.sms_type != report_mt)
+                bb_alog_sms(conn, sms, "FAILED Send SMS");
+            else
+                bb_alog_sms(conn, sms, "FAILED Send DLR");
 
         /* generate relay confirmancy message */
         if (DLR_IS_SMSC_FAIL(sms->sms.dlr_mask) ||

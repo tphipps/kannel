@@ -1,7 +1,7 @@
 /* ==================================================================== 
  * The Kannel Software License, Version 1.0 
  * 
- * Copyright (c) 2001-2010 Kannel Group  
+ * Copyright (c) 2001-2012 Kannel Group  
  * Copyright (c) 1998-2001 WapIT Ltd.   
  * All rights reserved. 
  * 
@@ -114,6 +114,7 @@ typedef struct ModemDef {
     Octstr *message_storage;
     long message_start;
     int	enable_mms;
+    int	hardware_flow_control;
 } ModemDef;
 
 typedef struct PrivAT2data {

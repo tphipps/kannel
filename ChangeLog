@@ -1,3 +1,259 @@
+2012-08-31  Stipe Tolj  <stolj at kannel.org>
+    * gwlib/dict.[ch]: added function dict_duplicate() allowing an easy
+      logical content duplication of an existing Dict structure, added
+      functions dict_traverse[_sorted]() which allow in Dict traversal without
+      locking the Dict logically outside, before going into a traversal loop.
+      The sorted version allows to pre-sort the data elements of the Dict
+      via a custom sorting function, then traversing the elements in this
+      sorted order.
+      
+2012-08-31 Alexander Malysh <amalysh at kannel.org>
+    * gwlib/octstr.[ch]: added two new functions: octstr_str_search and octstr_str_rsearch.
+
+2012-08-31 Alexander Malysh <amalysh at kannel.org>
+    * gw/smsc/smsc_http.c: fixed segfault produced by last commit.
+
+2012-08-29 Alexander Malysh <amalysh at kannel.org>
+    * gw/smsc/http/*.c, gw/smsc/smsc_http.c: splitted HTTP SMSC submodules into files.
+      This allow us to reduce code in HTTP SMSC itself and prepare this SMSC for
+      dynamicaly loading of submodules.
+      No behavior change in any implementation.
+
+2012-08-22 Alexander Malysh <amalysh at kannel.org>
+    * gwlib/octstr.c: replaced old hash funtion with hash from Robert Sedgewick.
+
+2012-08-06 Andreas Fink <andreas at fink.org>
+    * gw/smsc/smsc_at.c: fixed a bug which crashed bearerbox if no
+      modem definition was used in the config.
+
+2012-08-06  Stipe Tolj  <stolj at kannel.org>
+    * test/test_dict.c: add a second Dict to cross-key check, testing value
+      consistancy.
+      
+2012-08-06  Stipe Tolj  <stolj at kannel.org>
+    * gw/dlr_spool.c: reduce code complexity be re-using the essential parts.
+    
+2012-08-06  Stipe Tolj  <stolj at kannel.org>
+    * */*: updating the LICENSE preamble to reflect the correct year.
+    
+2012-08-06  Stipe Tolj  <stolj at kannel.org>
+    * doc/userguide/userguide.xml: add documentation about 'dlr-storage = spool'
+    * gw/dlr_p.h: add dlr_init_spool() prototype.
+    * gw/dlr_spool.c: implement a DLR storage using a spool directory. This
+      uses either a SHA1 or MD5 hash representing the msg ID, adding a suffix
+      of the destination address. When dlr_find() is called, we use the same
+      heuristic approach to resolve the correct DLR message as in the internal
+      DLR storage module.
+    * gw/dlr.c: add initialization call to dlr_init_spool() if configured
+      accordingly.
+    * gwlib/cfg.def: add config directive 'dlr-spool' in the core group to let
+      the user define which DLR storage spool location should be used.
+    This patchset implements a simple, natively supported (no external libs)
+    persistent DLR storage on the local file system using a spool directory.
+    
+2012-08-06  Stipe Tolj  <stolj at kannel.org>
+    * configure[.in], gw-config.h.in: add detection of POSIX.1 nftw() 
+      availability.
+    * test/test_file_traversal.c: file traversal test, using two different
+      approaches to traverse a directory structure recursively.
+    
+2012-08-06  Stipe Tolj  <stolj at kannel.org>
+    * test/test_hash.c: simple test program replacing test_md5.c which
+      computes both, MD5 hash digest and a SHA1 hash digest if openssl has
+      been available.
+      
+2012-08-06  Stipe Tolj  <stolj at kannel.org>
+    * test/test_dict.c: add a lookup phase too, in order to have a populate
+      and lookup phase while testing.
+    
+2012-07-17 Alexander Malysh <amalysh at kannel.org>
+    * README: applied patch that corrects docs build on current debian.
+      Thanks to Martin Atukunda <matlads at gmail.com> for this patch.
+
+2012-07-04  Stipe Tolj  <stolj at kannel.org>
+    * doc/CodingStyle: fix type for --pad-oper option. NLC.
+     
+2012-06-02  Stipe Tolj  <stolj at kannel.org>
+    * gwlib/http.c: fix possible problems for HTTP/1.1 "Host" header value. We
+      need to remove the port in both cases that contain the standard port
+      values, port 80 for non-SSL and port 443 for SSL-enabled connections.
+    
+2012-05-31 Alexander Malysh <amalysh at kannel.org>
+    * doc/userguide/userguide.xml: removed meta-data from smsc group because it
+      is not supported there.
+
+2012-05-23 Alexander Malysh <amalysh at kannel.org>
+    * gw/smsc/smsc_smpp.c: added workaround for deferred=0.
+
+2012-05-16 Andreas Fink <andreas at fink.org>
+    * gw/smsc_at.c gw/smsc_at.h gwlib/cfg.def: implemented ability to disable
+    hardware flow control from the computer side due to some broken modems
+    who not simply ignore hardware flow control but actually wire it in the
+    way that if its enabled, flow is always disabled. You can now
+    say hardware-flow-control = 0 in the modem definition to let the computer
+    ignore that fake signal. Note this is not the same as enable-hwhs which is the
+    AT command to tell the modem to actually use flow control. hardware-flow-control
+    is the hardware flow control for the computer side.
+
+2012-04-20 Alexander Malysh <amalysh at kannel.org>
+    * gw/smsbox.c: fixed issue with shut down of smsbox.
+
+2012-04-19  Stipe Tolj  <stolj at kannel.org>
+    * doc/userguide/userguide.xml: adding documentation for escape code %x
+      applicable for 'access-log-format' in the 'group = core' context.
+    * gw/bb_alog.c: adding escape code %x for 'access-log-format' pattern
+      handling, which substitutes to the smsbox-id. Reformated the function
+      to comply with CodingStyle standards.
+      
+2012-04-08 Alexander Malysh <amalysh at kannel.org>
+    * gw/smsbox.c: fixed double free bug for post request.
+      Thanks to Bartlomiej Balcerek <Bartlomiej.Balcerek at pwr.wroc.pl>
+      for bug report.
+
+2012-04-06 Alexander Malysh <amalysh at kannel.org>
+    * doc/arch/arch.xml: fixed #354.
+
+2012-04-06 Alexander Malysh <amalysh at kannel.org>
+    * doc/arch/arch.xml: fixed #355.
+
+2012-04-06 Alexander Malysh <amalysh at kannel.org>
+    * doc/userguide/userguide.xml: fixed default source and destination addr
+      ton. This fixes #636.
+
+2012-03-28  Stipe Tolj  <stolj at kannel.org>
+    * gw/smsbox.c: fix minor compiler warning. NLC.
+    
+2012-03-21 Alexander Malysh <amalysh at kannel.org>
+    * gw/smsc/smsc_http.c, gwlib/cfg.def, doc/userguide/userguide.xml:
+      added new option 'generic-param-dlr-err' to pass dlr-err for DLR.
+
+2012-03-21 Alexander Malysh <amalysh at kannel.org>
+    * gw/smsc/smsc_http.c: don't convert HTTP dlr errorcode as stated in SMPP
+      spec because HTTP is not SMPP. Just pass dlr errorcode as is to smsbox
+      in ?dlr? meta data group, similar to other smsc modules.
+
+2012-03-21 Alexander Malysh <amalysh at kannel.org>
+    * gw/smsc/smsc_http.c: request DLR also if conndata->dlr_url is set.
+
+2012-03-21 Alexander Malysh <amalysh at kannel.org>
+    * gw/smsc/smsc_http.c: write the whole URL, with query string by debugging.
+
+2012-03-21 Alexander Malysh <amalysh at kannel.org>
+    * gw/meta_data.h: added some defines to use for meta data.
+
+2012-03-08  Stipe Tolj  <stolj at kannel.org>
+    * gw/bb_boxc.c: fix MO routing logic implied by 'smsbox-route' context. We
+      have been passing MOs that had a strict smsbox-id routing decission to
+      an random not-identified smsbox if there was no smsbox-id connection.
+      This breaks the MO routing criteria. Now we obey the smsbox-id routing
+      decission and re-inject the MO message rather back to the main queue.
+      This patchset fixes bug #633.
+      
+2012-03-07 Alexander Malysh <amalysh at kannel.org>
+    * contrib/kannel-monitor/index.php, contrib/kannel-monitor/xmltoarray.php:
+      This patch adds replaces the <? to <?php to fully support when open tags
+      are not configured. This patch fixes #250.
+      Thanks to Renato Jop for this patch. 
+
+2012-02-23 Alexander Malysh <amalysh at kannel.org>
+    * acinclude.m4, configure: added GIT version check
+
+2012-02-21 Alexander Malysh <amalysh at kannel.org>
+    * test/test_http_server.c: allow define custom response headers.
+
+2012-02-15  Stipe Tolj  <stolj at kannel.org>
+    * gw/smsc/smsc_http.c: inject 'text' and username variables to DLR message
+      passed back to a smsbox connection. This harmonizes the behaviour to be
+      similar as for the SMPP client module part.
+      
+2012-02-08 Alexander Malysh <amalysh at kannel.org>
+    * wap/wtls_pdu.c: fixed possible segfault.
+      Thanks to Armindo Antunes <armindo.antunes at gmail.com> for this patch.
+
+2012-02-02 Alexander Malysh <amalysh at kannel.org>
+    * gw/bb_smscconn.c: fixed bb_smscconn_send_failed for DLRs.
+
+2012-01-25  Stipe Tolj  <stolj at kannel.org>
+    * configure: fixing autoconf generated script from Andreas, which breaks
+      the 'config.nice' re-configuration handling. Seems to be the autoconf
+      version related. NLC.
+
+2012-01-24 Alexander Malysh <amalysh at kannel.org>
+    * gw/smsc/smsc_smpp.c: fixed compiler warnings
+
+2012-01-16  Stipe Tolj  <stolj at kannel.org>
+    * gw/smsc/smsc_[http|smpp].c: again, minor source code changes to follow
+      our doc/CodingStyle rules! NLC.
+      
+2012-01-12 Andreas Fink <afink at smsrelay.com>
+    * gw/smsc/smsc_smpp.c: proper handling of network_error_code. Kannel assumed
+      it was the same 3 characters as in the delivery report string but 
+      spec says something else so its properly converted now. 
+      Whitespace changes (removed tabs).
+    * ChangeLog. Corrected Stipe's year
+
+2012-01-07  Stipe Tolj  <stolj at kannel.org>
+    * gw/smsc/smsc_http.c: slight code change from Andrea's previous commit. We
+      don't need to allocate more variables on the stack as we have a temp 
+      Ocstr* already. NLC.
+      
+2012-01-07 Andreas Fink <afink at smsrelay.com> 
+    * gw/smsc/smsc_http.c: added new parameter for DLR named dlr-err which can
+      contain a network error code which is parsed the same way the err: field
+      in SMPP delivery reports are parsed.
+    * configure[.in]: added support for MacOS X 10.7 Lion SDK.
+
+2011-11-09 Alexander Malysh <amalysh at kannel.org>
+    * gwlib/octstr.c, gwlib/octstr.c.debug: fixed segfault on some systems where
+      long overflow occurs. This fixes #623.
+      Thanks to Lutalo Joseph Willrich for patch.
+
+2011-10-31 Alexander Malysh <amalysh at kannel.org>
+    * reverted commited that moved .foreign_id injection from dlr_add() because
+      it breaks other SMSC module as SMPP.
+
+2011-10-26 Alexander Malysh <amalysh at kannel.org>
+    * wmlscript/wsgram.y: fixed compilation error.
+
+2011-10-13  Stipe Tolj  <stolj at kannel.org>
+    * configure[.in]: need to test for <sys/ucontext.h>, tbough it is defined 
+      in IEEE Std 1003.1-2001/Cor 2-2004 it is not fully portable, i.e. OpenBSD
+      and Cygwin lack the functionality.
+    * gw-config.h.in: add HAVE_UCONTEXT macro.
+    * gw/shared.c: add header include to fix implicite declaration warning. NLC.
+    * gwlib/utils.c: include <sys/ucontext.h> only if the system has user 
+      context support, fix minor compiler warning. 
+      
+2011-10-11 Alexander Malysh <amalysh at kannel.org>
+    * gwlib/log.[ch], gwlib/utils.[ch]: extracted backtrace output into extra
+      function. Added fatal signal handler in order to be able to trace segfaults.
+
+2011-10-11  Stipe Tolj  <stolj at kannel.org>
+    * gw/smsc/smsc_smpp.c: moved .foreign_id injection from dlr_add() to the
+      submit_sm_resp PDU handling code, otherwise we would ONLY see foreign IDs
+      in the access-log IF DLR have been requested. Now we see them in any case.
+    * gw/dlr.c: remove .foreign_id injection code in dlr_add(), due that this is
+      the wrong place to do it. If the user didn't request a DLR, we still want
+      to pickup the foreign ID and use it, at least in the access-log i.e.
+    
+2011-10-09 Alexander Malysh <amalysh at kannel.org>
+    * gw/smsc/smsc_smpp.c: fixed encoding of LATIN1 messages.
+      This fixes #613.
+      Thanks to Anders B for this patch.
+
+2011-10-09 Alexander Malysh <amalysh at kannel.org>
+    * gw/smsbox.c:: Set charset to UTF-8 for POST requests.
+      This fixes #614.
+      Thanks Anders B for the patch.
+
+2011-10-09 Alexander Malysh <amalysh at kannel.org>
+    * gw/smsbox.c: fixed double charset processing for POST requests.
+      This fixes #615.
+
+2011-10-09 Alexander Malysh <amalysh at kannel.org>
+    * gw/bearerbox.c, gw/shared.[ch], gw/smsbox.c, gw/wapbox.c, gwlib/gwlib.[ch], gwlib/utils.c:
+      This patch should fix issues with restart HTTP command.
+
 2011-10-06  Stipe Tolj  <stolj at kannel.org>
     * gw/smsc/smsc_http.c: fix default DLR storing behaviour for 'generic' type.
       We shall always store the DLR temp data in a successful transmission,
